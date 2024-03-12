@@ -8,50 +8,75 @@ collection: im-template-jobs
 jobs:
 
   echo:
-    name: Echo
+    name: Optimisation
     description: >-
-      Echos a message and writes it to an output file
+      Calculates optimised geometry for input 2D or 3D structure
     version: '1.0.0'
     category: echo
     keywords:
-    - echo
+    - 3D geometry optimisation
+    - conformer generation
     image:
-      name: informaticsmatters/data-manager-job-template
-      tag: '1.0.2'
+      name: informaticsmatters/squonk2-auto3d
+      tag: '1.0.0'
       project-directory: /data
       working-directory: /data
     command: >-
-      /code/echo.py --msg '{{ msg }}' --out '{{ outputFile }}'
+      /code/auto3d.py '{{ inputFile }}'
+      --output '{{ outputFile }}'
+      --opt_steps '{{ optSteps }}'
     variables:
+      order:
+        options:
+        - inputFile
+        - outputFile
+        - optSteps
+      inputs:
+        type: object
+        required:
+        - inputFile
+        properties:
+          inputFile:
+            title: Molecules to predict (.sdf or .smi)
+            mime-types:
+            - squonk/x-smiles
+            - chemical/x-daylight-smiles
+            - chemical/x-mdl-sdfile
+            type: file
       outputs:
         type: object
         properties:
           outputFile:
             title: Output file
             mime-types:
-            - text/plain
+            - chemical/x-mdl-sdfile
             creates: '{{ outputFile }}'
             type: file
         required:
         - outputFile
       options:
         type: object
-        properties:
-          msg:
-            title: The message to echo
-            type: string
         required:
-        - msg
+        - outputFile
+        properties:
+          outputFile:
+            title: Output file name
+            type: string
+            pattern: "^[A-Za-z0-9_/\\.\\-]+$"
+          optSteps:
+            title: Maximum optimization steps for each structure
+            type: number
     # Tests
     tests:
       simple-execution:
+        inputs:
+          inputFile: data/triplet.smi
         options:
-          outputFile: echo.txt
-          msg: Hello, World!
+          outputFile: result.sdf
+          optSteps: 1000
         checks:
           exitCode: 0
           outputs:
-          - name: echo.txt
+          - name: result.sdf
             checks:
             - exists: true
-            - lineCount: 1
