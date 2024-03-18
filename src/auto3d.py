@@ -58,7 +58,10 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
             continue
         except StopIteration as ex:
             # end of file
-            break    
+            break
+
+        if mol.GetNumAtoms() == 0:
+            continue
 
         output_filename = str(Path(temp_dir).joinpath(f'input_{str(count)}{ext}'))
         result.append(output_filename)

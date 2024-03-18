@@ -120,7 +120,7 @@ jobs:
           k:
             title: Outputs the top-k structures for each input
             type: integer
-	    default: 1
+            default: 1
           window:
             title: Outputs the structures whose energies are within x (kcal/mol) from the lowest energy conformer. Only one of --k and --window need to be specified.
             type: number
@@ -211,12 +211,23 @@ jobs:
     # Tests
     tests:
       simple-execution:
+        inputs:
+          inputFile: data/methane.smi
+        options:
+          outputFile: result.sdf
+          optSteps: 1000
+        checks:
+          exitCode: 0
+          outputs:
+          - name: result.sdf
+            checks:
+            - exists: true
+      complex-execution:
         run-level: 5
         inputs:
           inputFile: data/triplet.smi
         options:
           outputFile: result.sdf
-          optSteps: 100
         checks:
           exitCode: 0
           outputs:
