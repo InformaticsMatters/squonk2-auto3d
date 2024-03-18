@@ -63,7 +63,7 @@ jobs:
       with:
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ${{ env.REPOSITORY }}:${{ env.GITHUB_REF_SLUG }}
+        tags: ${{ env.REPOSITORY }}:latest
     - name: Test
       run: |
-        jote --image-tag ${{ env.GITHUB_REF_SLUG }}
+        jote --image-tag latest
