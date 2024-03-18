@@ -18,11 +18,11 @@ jobs:
     - conformer
     image:
       name: informaticsmatters/squonk2-auto3d
-      tag: '1.0.0'
+      tag: latest
       project-directory: /data
       working-directory: /data
       memory: 3Gi
-      cores: 4
+      cores: 3
     command: >-
       /code/auto3d.py '{{ inputFile }}'
       --output '{{ outputFile }}'
