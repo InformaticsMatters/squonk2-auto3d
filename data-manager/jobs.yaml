@@ -30,7 +30,7 @@ jobs:
       {% if window is defined %}--window {{ window }}{% endif %}
       {% if enumerateTautomer is defined %}--enumerate_tautomer {{ enumerateTautomer }}{% endif %}
       {% if tautoEngine is defined %}--tauto_engine {{ tautoEngine }}{% endif %}
-      {% if pKaNorm is defined %}--pKaNorm {{ pKaNorm }}{% endif %}
+      {% if pKaNorm is defined %}--pKaNorm{% endif %}
       {% if isomerEngine is defined %}--isomer_engine {{ isomerEngine }}{% endif %}
       {% if enumerateIsomer is defined %}--enumerate_isomer {{ enumerateIsomer }}{% endif %}
       {% if modeOe is defined %}--mode_oe {{ modeOe }}{% endif %}
