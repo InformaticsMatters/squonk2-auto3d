@@ -8,6 +8,8 @@
 [![publish-stable](https://github.com/InformaticsMatters/squonk2-auto3d/actions/workflows/publish-stable.yaml/badge.svg)](https://github.com/InformaticsMatters/squonk2-auto3d/actions/workflows/publish-stable.yaml)
 
 ![GitHub](https://img.shields.io/github/license/informaticsmatters/squonk2-jaqpot)
+
+
 A Squonk2 Data Manager Job repository for geometry optimisations and low-energy conformer generation with [Auto3D](https://pypi.org/project/Auto3D/).
 
 
