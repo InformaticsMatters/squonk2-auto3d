@@ -120,6 +120,7 @@ jobs:
           k:
             title: Outputs the top-k structures for each input
             type: integer
+	    default: 1
           window:
             title: Outputs the structures whose energies are within x (kcal/mol) from the lowest energy conformer. Only one of --k and --window need to be specified.
             type: number
