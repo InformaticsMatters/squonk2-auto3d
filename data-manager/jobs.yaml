@@ -94,24 +94,6 @@ jobs:
         type: object
         required:
         - outputFile
-        - k
-        - window
-        - enumerateTautomer
-        - tautoEngine
-        - pKaNorm
-        - isomerEngine
-        - enumerateIsomer
-        - modeOe
-        - maxConfs
-        - optimizingEngine
-        - patience
-        - optSteps
-        - convergenceThreshold
-        - threshold
-        - delimiter
-        - idColumn
-        - readHeader
-        - writeHeader
         properties:
           outputFile:
             title: Output file name
