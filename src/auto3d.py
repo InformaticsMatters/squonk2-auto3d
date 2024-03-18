@@ -3,29 +3,19 @@
 """
 import argparse
 import os
-import multiprocessing as mp
-import time
-import logging
 import tempfile
-import mmap
-from io import StringIO
-import torch
 import shutil
-import math
 
-from typing import Union, List
 from pathlib import Path
 
 # Import Data Manager DmLog utility.
 # Messages emitted using this result in Task Events.
 # from dm_job_utilities.dm_log import DmLog
 
-from rdkit import Chem
 import rdkit_utils
 
-from Auto3D.auto3D import options, smiles2mols, main
+from Auto3D.auto3D import options, main
 from dm_job_utilities.dm_log import DmLog
-import gc
 
 # logger = logging.getLogger(__name__)
 
@@ -34,54 +24,73 @@ CHUNK_SIZE = 4096
 
 
 path = Path(__file__).parent.absolute()
-# smiles = ["CCNCC", "O=C(C1=CC=CO1)N2CCNCC2"]
-# args = options(k=1, use_gpu=False)
-# mols = smiles2mols(smiles, args)
 
-                
-def read_input(input_file_path):
-    DmLog.emit_event(Path(".").absolute())
-    # temp_dir = tempfile.mkdtemp(dir='data')
-    temp_dir = tempfile.mkdtemp(dir=path)
-    # temp_dir = tempfile.mkdtemp()
-    print('tempdir', temp_dir)
+# for local development, data directory exists in repo but not copied to container
+try:
+    path = path.parent.joinpath('data')
+except NameError:
+    pass
+
+
+def process_input(input_filename, write_header, delimiter, read_header, id_column, sdf_read_records):
     result = []
+    temp_dir = tempfile.mkdtemp(dir=path)
+    reader = rdkit_utils.create_reader(
+        input_filename,
+        delimiter=delimiter,
+        read_header=read_header,
+        id_column=id_column,
+        sdf_read_records=sdf_read_records,
+    )
+
+    extra_field_names = reader.get_extra_field_names()
+    calc_prop_names = []
+
+    ext = Path(input_filename).suffix
+
     count = 0
-    ext = Path(input_file_path).suffix
-    if ext in ('.smi', '.smiles'):
-        sep = '\n'
-    elif ext in ('.sdf', '.sd'):
-        sep = SDF_SEP
-    else:
-        DmLog.emit_event(f'Unknown file type: {ext}')
-        raise TypeError
-    
-    with open(input_file_path, 'r') as input_file:
-        count = 0
-        buff = StringIO()
-        for line in input_file:
-            buff.write(line)
-            if sep in line:
-                count += 1
-                fname = str(Path(temp_dir).joinpath(f'input_{str(count)}{ext}'))
-                with open(fname, 'w') as output_file:
-                    output_file.write(buff.getvalue())
-                buff = StringIO()
-                result.append(fname)
-
-    return result                
-
-def concat_output(output_file_path, opt_result):
-    with open(output_file_path,'ab') as wfd,  open(opt_result,'rb') as fd:
-        shutil.copyfileobj(fd, wfd)    
-
-def diagnostics():
     while True:
-        # print('proc', proc)
-        # print('procdir', dir(proc))
-        # print(proc.__dict__)
-        time.sleep(10)
+        count += 1
+        try:
+            mol, smi, mol_id, props = reader.read()
+        except TypeError as ex:
+            DmLog.emit_event(f"{ex}")
+            continue
+        except StopIteration as ex:
+            # end of file
+            break    
 
+        output_filename = str(Path(temp_dir).joinpath(f'input_{str(count)}{ext}'))
+        result.append(output_filename)
+        writer = rdkit_utils.create_writer(
+            output_filename,
+            delimiter=delimiter,
+        )
+
+        if write_header:
+            headers = rdkit_utils.generate_header_values(extra_field_names, len(props), calc_prop_names)
+            writer.write_header(headers)
+
+        writer.write(
+            smiles=smi,
+            mol=mol,
+            mol_id=mol_id,
+            existing_props=props,  # only used in SmilesWriter
+        )
+
+        writer.close()
+        
+    reader.close()
+    return result
+
+      
+        
+def concat_output(output_file_path, opt_result):
+    with open(opt_result,'rb') as opt_file:
+        count = opt_file.read().count(b'$$$$')
+        with open(output_file_path,'ab') as result_file:
+            shutil.copyfileobj(opt_file, result_file)
+    return count
 
 
 
@@ -89,7 +98,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auto3D Package")
 
     # Input parameters
-    # parser.add_argument("--path", type=str, help="A input.smi containing SMILES and IDs")
     parser.add_argument("path", type=str, help="A path of .smi or .SDF file to store all molecules and IDs.")
     parser.add_argument("--output", default="result.sdf", help="The output file")    
     parser.add_argument(
@@ -97,7 +105,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--window",
-        action="store_true",
+        type=float,
         help="Outputs the structures whose energies are within x (kcal/mol) from the lowest energy conformer. Only one of --k and --window need to be specified.",
     )
     parser.add_argument(
@@ -168,7 +176,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--capacity",
         type=int,
-        default=42,
+        default=40,
         help="Number of SMILES that the model will handle for 1 G memory",
     )
     parser.add_argument(
@@ -214,6 +222,27 @@ if __name__ == "__main__":
         default=1024,
         help="The number of atoms in 1 optimization batch for 1GB",
     )
+    parser.add_argument("-d", "--delimiter", default="\t", help="Delimiter when using SMILES")
+    parser.add_argument(
+        "--id-column",
+        help="Column for name field (zero based integer for .smi, text for SDF)",
+    )
+    parser.add_argument(
+        "--read-header",
+        action="store_true",
+        help="Read a header line with the field names when reading .smi or .txt",
+    )
+    parser.add_argument(
+        "--write-header",
+        action="store_true",
+        help="Write a header line when writing .smi or .txt",
+    )
+    parser.add_argument(
+        "--sdf-read-records",
+        default=100,
+        type=int,
+        help="Read this many SDF records to determine field names",
+    )    
 
     args = parser.parse_args()
 
@@ -244,40 +273,38 @@ if __name__ == "__main__":
     )
 
     num_outputs = 0
-    count = -1
 
-    files = read_input(args.path)
-    print(files)
-    # print(asdfg)
+    files = process_input(
+        input_filename=args.path,
+        write_header=args.write_header,
+        delimiter=args.delimiter,
+        read_header=args.read_header,
+        id_column=args.id_column,
+        sdf_read_records=args.sdf_read_records,        
+    )
 
+    DmLog.emit_event('Input files prepared')
 
     for f in files:
-        print(f)
-        count += 1
+        DmLog.emit_event(f'Processing {f}')
         opts['path'] = str(f)
         
         try:
             result = main(opts)
-            concat_output(args.output, result)
+            num_outputs += concat_output(args.output, result)
         except RuntimeError as exc:
-            print('\n\n\nCuda error?\n\n\n', exc)
+            DmLog.emit_event(f"Error processing {f}, no output produced: {exc}")
         except OSError as exc:
-            # this seems to happen with incomplete opt, not enough steps
-            print('\n\n\nos error\n\n\n', exc)
+            # this SEEMS to happen with incomplete optimisation, not enough steps
+            DmLog.emit_event(f"Error processing {f}, no output produced: {exc}")
         except EOFError as exc:
-            # idk, it thows it every time
-            print('\n\n\neof error\n\n\n', exc)
-        finally:
-            torch.cuda.empty_cache()
-            gc.collect()
-            # this is not enough, BUT it doesn't happen with the
-            # molecule alone. garbage collect/kill the thread
-            # somehow?
+            DmLog.emit_event(f"Error processing {f}, no output produced: {exc}")
 
     
-    # diag_proc = mp.Process(target=diagnostics)
-    # diag_proc.start()
-    
 
-    os.chmod(args.output, 0o664)    
+    if Path(args.output).is_file():
+        os.chmod(args.output, 0o664)
+
+    DmLog.emit_event(num_outputs, "outputs from", len(files), "molecules")
+    DmLog.emit_cost(num_outputs)        
     

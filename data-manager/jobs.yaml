@@ -2,8 +2,8 @@
 kind: DataManagerJobDefinition
 kind-version: '2021.1'
 
-name: Template Jobs
-collection: im-template-jobs
+name: Geometry optimisation and conformer generation with Auto3D
+collection: im-auto3d
 
 jobs:
 
@@ -21,16 +21,52 @@ jobs:
       tag: '1.0.0'
       project-directory: /data
       working-directory: /data
+      memory: 3Gi
+      cores: 4
     command: >-
       /code/auto3d.py '{{ inputFile }}'
       --output '{{ outputFile }}'
-      --opt_steps '{{ optSteps }}'
+      {% if k is defined %}--k {{ k }}{% endif %}
+      {% if window is defined %}--window {{ window }}{% endif %}
+      {% if enumerateTautomer is defined %}--enumerate_tautomer {{ enumerateTautomer }}{% endif %}
+      {% if tautoEngine is defined %}--tauto_engine {{ tautoEngine }}{% endif %}
+      {% if pKaNorm is defined %}--pKaNorm {{ pKaNorm }}{% endif %}
+      {% if isomerEngine is defined %}--isomer_engine {{ isomerEngine }}{% endif %}
+      {% if enumerateIsomer is defined %}--enumerate_isomer {{ enumerateIsomer }}{% endif %}
+      {% if modeOe is defined %}--mode_oe {{ modeOe }}{% endif %}
+      {% if maxConfs is defined %}--max_confs {{ maxConfs }}{% endif %}
+      {% if optimizingEngine is defined %}--optimizing_engine {{ optimizingEngine }}{% endif %}
+      {% if patience is defined %}--patience {{ patience }}{% endif %}
+      {% if optSteps is defined %}--opt_steps {{ optSteps }}{% endif %}
+      {% if convergenceThreshold is defined %}--convergence_threshold {{ convergenceThreshold }}{% endif %}
+      {% if threshold is defined %}--threshold {{ threshold }}{% endif %}
+      {% if delimiter is defined %}--delimiter {{ delimiter }}{% endif %}
+      {% if idColumn is defined %}--id-column {{ idColumn }}{% endif %}
+      {% if readHeader is defined and readHeader %}--read-header{% endif %}
+      {% if writeHeader is defined and writeHeader %}--write-header{% endif %}
     variables:
       order:
         options:
         - inputFile
         - outputFile
+        - k
+        - window
+        - enumerateTautomer
+        - tautoEngine
+        - pKaNorm
+        - isomerEngine
+        - enumerateIsomer
+        - modeOe
+        - maxConfs
+        - optimizingEngine
+        - patience
         - optSteps
+        - convergenceThreshold
+        - threshold
+        - delimiter
+        - idColumn
+        - readHeader
+        - writeHeader
       inputs:
         type: object
         required:
@@ -58,14 +94,119 @@ jobs:
         type: object
         required:
         - outputFile
+        - k
+        - window
+        - enumerateTautomer
+        - tautoEngine
+        - pKaNorm
+        - isomerEngine
+        - enumerateIsomer
+        - modeOe
+        - maxConfs
+        - optimizingEngine
+        - patience
+        - optSteps
+        - convergenceThreshold
+        - threshold
+        - delimiter
+        - idColumn
+        - readHeader
+        - writeHeader
         properties:
           outputFile:
             title: Output file name
             type: string
             pattern: "^[A-Za-z0-9_/\\.\\-]+$"
+          k:
+            title: Outputs the top-k structures for each input
+            type: integer
+          window:
+            title: Outputs the structures whose energies are within x (kcal/mol) from the lowest energy conformer. Only one of --k and --window need to be specified.
+            type: number
+          enumerateTautomer:
+            title: When True, enumerate tautomers for the input
+            type: boolean
+            default: false
+          tautoEngine:
+            title: Programs to enumerate tautomers
+            type: string
+            default: rdkit
+            enum:
+            - rdkit
+            - oechem
+          pKaNorm:
+            title: When True, the ionization state of each tautomer will be assigned to a predominant state at ~7.4 (Only works when tauto_engine=’oechem’)
+            type: boolean
+            default: false
+          isomerEngine:
+            title: The program for generating 3D isomers for each input
+            type: string
+            default: rdkit
+            enum:
+            - rdkit
+            - omega
+          enumerateIsomer:
+            title: When True, cis/trans and r/s isomers are enumerated
+            type: boolean
+            default: true
+          modeOe:
+            title: The mode that omega program will take
+            type: string
+            default: classic
+            enum:
+            - classic
+            - macrocycle
+            - dense
+            - pose
+            - rocs
+            - fast_rocs
+          maxConfs:
+            title: Maximum number of isomers for each input
+            type: integer
+          optimizingEngine:
+            title: Choose either ANI2x, ANI2xt, or AIMNET for energy calculation and geometry optimization
+            type: string
+            default: AIMNET
+            enum:
+            - ANI2x
+            - ANI2xt
+            - AIMNET
+          patience:
+            title: If the force does not decrease for a continuous patience steps, the conformer will drop out of the optimization loop
+            type: integer
+            default: 1000
           optSteps:
             title: Maximum optimization steps for each structure
-            type: number
+            type: integer
+            default: 5000
+          convergenceThreshold:
+            title: Optimization is considered as converged if maximum force is below this threshold
+            type: float
+            default: 0.003
+          threshold:
+            title: If the RMSD between two conformers are within threshold, they are considered as duplicates
+            type: float
+            default: 0.3
+          delimiter:
+            title: Delimiter for text formats
+            type: string
+            default: tab
+            enum:
+            - tab
+            - comma
+            - space
+            - pipe
+          idColumn:
+            title: ID field (name for .sdf, zero based index for .smi)
+            type: string
+          readHeader:
+            title: Read header line
+            type: boolean
+            default: true
+          writeHeader:
+            title: Write header line
+            type: boolean
+            default: true
     # Tests
     tests:
       simple-execution:
@@ -73,7 +214,7 @@ jobs:
           inputFile: data/triplet.smi
         options:
           outputFile: result.sdf
-          optSteps: 1000
+          optSteps: 100
         checks:
           exitCode: 0
           outputs:
