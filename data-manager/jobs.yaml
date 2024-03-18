@@ -117,6 +117,7 @@ jobs:
             title: Output file name
             type: string
             pattern: "^[A-Za-z0-9_/\\.\\-]+$"
+            default: result.sdf
           k:
             title: Outputs the top-k structures for each input
             type: integer
@@ -182,11 +183,11 @@ jobs:
             default: 5000
           convergenceThreshold:
             title: Optimization is considered as converged if maximum force is below this threshold
-            type: float
+            type: number
             default: 0.003
           threshold:
             title: If the RMSD between two conformers are within threshold, they are considered as duplicates
-            type: float
+            type: number
             default: 0.3
           delimiter:
             title: Delimiter for text formats
