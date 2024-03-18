@@ -211,6 +211,7 @@ jobs:
     # Tests
     tests:
       simple-execution:
+        run-level: 5
         inputs:
           inputFile: data/triplet.smi
         options:
