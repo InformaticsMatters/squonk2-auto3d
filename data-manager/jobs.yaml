@@ -29,11 +29,7 @@ jobs:
       {% if k is defined %}--k {{ k }}{% endif %}
       {% if window is defined %}--window {{ window }}{% endif %}
       {% if enumerateTautomer is defined %}--enumerate_tautomer {{ enumerateTautomer }}{% endif %}
-      {% if tautoEngine is defined %}--tauto_engine {{ tautoEngine }}{% endif %}
-      {% if pKaNorm is defined %}--pKaNorm{% endif %}
-      {% if isomerEngine is defined %}--isomer_engine {{ isomerEngine }}{% endif %}
       {% if enumerateIsomer is defined %}--enumerate_isomer {{ enumerateIsomer }}{% endif %}
-      {% if modeOe is defined %}--mode_oe {{ modeOe }}{% endif %}
       {% if maxConfs is defined %}--max_confs {{ maxConfs }}{% endif %}
       {% if optimizingEngine is defined %}--optimizing_engine {{ optimizingEngine }}{% endif %}
       {% if patience is defined %}--patience {{ patience }}{% endif %}
@@ -52,11 +48,7 @@ jobs:
         - k
         - window
         - enumerateTautomer
-        - tautoEngine
-        - pKaNorm
-        - isomerEngine
         - enumerateIsomer
-        - modeOe
         - maxConfs
         - optimizingEngine
         - patience
@@ -111,39 +103,10 @@ jobs:
             title: When True, enumerate tautomers for the input
             type: boolean
             default: false
-          tautoEngine:
-            title: Programs to enumerate tautomers
-            type: string
-            default: rdkit
-            enum:
-            - rdkit
-            - oechem
-          pKaNorm:
-            title: When True, the ionization state of each tautomer will be assigned to a predominant state at ~7.4 (Only works when tauto_engine=’oechem’)
-            type: boolean
-            default: false
-          isomerEngine:
-            title: The program for generating 3D isomers for each input
-            type: string
-            default: rdkit
-            enum:
-            - rdkit
-            - omega
           enumerateIsomer:
             title: When True, cis/trans and r/s isomers are enumerated
             type: boolean
             default: true
-          modeOe:
-            title: The mode that omega program will take
-            type: string
-            default: classic
-            enum:
-            - classic
-            - macrocycle
-            - dense
-            - pose
-            - rocs
-            - fast_rocs
           maxConfs:
             title: Maximum number of isomers for each input
             type: integer

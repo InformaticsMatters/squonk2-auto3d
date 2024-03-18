@@ -18,11 +18,7 @@ This job optimises 3D geometry and generates low-energy conformers of the input 
 * **k**: Outputs the top-k structures for each input. Default `1`.
 * **Window**: Outputs the structures whose energies are within x (kcal/mol) from the lowest energy conformer. Only one of --k and --window need to be specified.
 * **Enumerate tautomers**: When True, enumerate tautomers for the input. Default `false`
-* **Tautomer engine**: Programs to enumerate tautomers. Default `rdkit`.
-* **pKaNorm**: When True, the ionization state of each tautomer will be assigned to a predominant state at ~7.4 (Only works when tauto_engine=`oechem`).
-* **Isomer engine**: The program for generating 3D isomers for each input. Default `rdkit`.
 * **Enumerate isomers**: When True, cis/trans and r/s isomers are enumerated. Default `true`.
-* **modeOe**:  The mode that omega program will take. Default `classic`.
 * **Max conformers**: Maximum number of isomers for each input.
 * **Optimizing engine**: Choose either ANI2x, ANI2xt, or AIMNET for energy calculation and geometry optimization. Default `AIMNET`.
 * **Patience**: If the force does not decrease for a continuous patience steps, the conformer will drop out of the optimization loop. Default `1000`.
