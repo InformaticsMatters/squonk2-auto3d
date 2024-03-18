@@ -7,15 +7,15 @@ collection: im-auto3d
 
 jobs:
 
-  echo:
+  auto3d:
     name: Optimisation
     description: >-
       Calculates optimised geometry for input 2D or 3D structure
     version: '1.0.0'
-    category: echo
+    category: comp chem
     keywords:
     - 3D geometry optimisation
-    - conformer generation
+    - conformer
     image:
       name: informaticsmatters/squonk2-auto3d
       tag: '1.0.0'
