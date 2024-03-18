@@ -1,4 +1,4 @@
-# data-manager-job-template
+# squonk2-auto3d
 
 ![Data Manager Job: 2021.1](https://img.shields.io/badge/data%20manager%20job-2021.1-000000?labelColor=dc332e)
 
