@@ -84,7 +84,7 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
         writer.close()
         
     reader.close()
-    return result
+    return temp_dir, result
 
       
         
@@ -278,7 +278,7 @@ if __name__ == "__main__":
 
     num_outputs = 0
 
-    files = process_input(
+    workdir, files = process_input(
         input_filename=args.path,
         write_header=args.write_header,
         delimiter=args.delimiter,
@@ -308,6 +308,9 @@ if __name__ == "__main__":
 
     if Path(args.output).is_file():
         os.chmod(args.output, 0o664)
+
+    if not args.verbose:
+        shutil.rmtree(Path(workdir))
 
     DmLog.emit_event(num_outputs, "outputs from", len(files), "molecules")
     DmLog.emit_cost(num_outputs)        
