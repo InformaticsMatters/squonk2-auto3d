@@ -1,10 +1,18 @@
-# The Data Manager auto3d Job documentation
+# Job: auto3d
 
 This describes how to run the `auto3d` job in the `im-auto3d` collection.
 
 ## What the job does
 
-This job optimises 3D geometry and generates low-energy conformers of the input 2D or 3D structure
+This job optimises 3D geometry and generates low-energy conformers of the input 2D or 3D structure.
+
+For more on the Auto3D package see the [Auto3D documentation](https://auto3d.readthedocs.io/en/latest/index.html).
+
+
+## Implementation details
+
+* Job implementation: [auto3d.py](/src/auto3d.py)
+* Job definition: `auto3d` in [jobs.yaml](../../jobs.yaml)
 
 
 ## How to run the job
@@ -25,8 +33,13 @@ This job optimises 3D geometry and generates low-energy conformers of the input 
 * **Optimisation steps**: Maximum optimization steps for each structure. Default `5000`.
 * **Convergence threshold**: Optimization is considered as converged if maximum force is below this threshold. Default `0.003`.
 * **Threshold**: If the RMSD between two conformers are within threshold, they are considered as duplicates. Default `0.3`.
-* **Delimiter**: delimiter to use in output file. Default: tab. Ignored in sdf output
-* **ReadHeader**: Read header from the input file. Default: False. Ignored in sdf output
+* **Delimiter**: Delimiter used in SMILES file. Default: tab. Ignored in sdf.
+* **ReadHeader**: Read header from the SMILES input file. Default: False. Ignored in sdf.
+
+
+## Limitations
+
+1. Currently, only `rdkit` is supported for both tautomer- and isomer generation.
 
 ## Related topics
 

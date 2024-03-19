@@ -91,6 +91,7 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
 def concat_output(output_file_path, opt_result):
     with open(opt_result,'rb') as opt_file:
         count = opt_file.read().count(b'$$$$')
+        opt_file.seek(0)
         with open(output_file_path,'ab') as result_file:
             shutil.copyfileobj(opt_file, result_file)
     return count
