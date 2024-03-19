@@ -27,7 +27,6 @@ This job optimises 3D geometry and generates low-energy conformers of the input 
 * **Threshold**: If the RMSD between two conformers are within threshold, they are considered as duplicates. Default `0.3`.
 * **Delimiter**: delimiter to use in output file. Default: tab. Ignored in sdf output
 * **ReadHeader**: Read header from the input file. Default: False. Ignored in sdf output
-* **WriteHeader**: Write header line to output file. Default: True. Ignored in sdf output
 
 ## Related topics
 

@@ -39,7 +39,6 @@ jobs:
       {% if delimiter is defined %}--delimiter {{ delimiter }}{% endif %}
       {% if idColumn is defined %}--id-column {{ idColumn }}{% endif %}
       {% if readHeader is defined and readHeader %}--read-header{% endif %}
-      {% if writeHeader is defined and writeHeader %}--write-header{% endif %}
     variables:
       order:
         options:
@@ -58,7 +57,6 @@ jobs:
         - delimiter
         - idColumn
         - readHeader
-        - writeHeader
       inputs:
         type: object
         required:
@@ -148,10 +146,6 @@ jobs:
             type: string
           readHeader:
             title: Read header line
-            type: boolean
-            default: true
-          writeHeader:
-            title: Write header line
             type: boolean
             default: true
     # Tests
