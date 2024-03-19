@@ -28,8 +28,8 @@ jobs:
       --output '{{ outputFile }}'
       {% if k is defined %}--k {{ k }}{% endif %}
       {% if window is defined %}--window {{ window }}{% endif %}
-      {% if enumerateTautomer is defined %}--enumerate_tautomer {{ enumerateTautomer }}{% endif %}
-      {% if enumerateIsomer is defined %}--enumerate_isomer {{ enumerateIsomer }}{% endif %}
+      {% if enumerateTautomer is defined %}--enumerate_tautomer {% endif %}
+      {% if enumerateIsomer is defined %}--enumerate_isomer {% endif %}
       {% if maxConfs is defined %}--max_confs {{ maxConfs }}{% endif %}
       {% if optimizingEngine is defined %}--optimizing_engine {{ optimizingEngine }}{% endif %}
       {% if patience is defined %}--patience {{ patience }}{% endif %}
