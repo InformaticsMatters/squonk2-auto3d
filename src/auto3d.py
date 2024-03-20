@@ -60,7 +60,9 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
             # end of file
             break
 
+        DmLog.emit_event(f'Found structure: {mol_id}')
         if mol.GetNumAtoms() == 0:
+            DmLog.emit_event(f'Zero-size structure removed: {mol_id}')
             continue
 
         output_filename = str(Path(temp_dir).joinpath(f'input_{str(count)}{ext}'))
