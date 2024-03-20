@@ -154,12 +154,12 @@ jobs:
         inputs:
           inputFile: data/methane.smi
         options:
-          outputFile: result.sdf
+          outputFile: result_methane.sdf
           optSteps: 1000
         checks:
           exitCode: 0
           outputs:
-          - name: result.sdf
+          - name: result_methane.sdf
             checks:
             - exists: true
       complex-execution:
@@ -167,10 +167,23 @@ jobs:
         inputs:
           inputFile: data/triplet.smi
         options:
-          outputFile: result.sdf
+          outputFile: result_triplet.sdf
         checks:
           exitCode: 0
           outputs:
-          - name: result.sdf
+          - name: result_triplet.sdf
+            checks:
+            - exists: true
+      realistic-molecules:
+        run-level: 5
+        inputs:
+          inputFile: data/test2.sdf
+        options:
+          outputFile: result_test2.sdf
+          optSteps: 10000
+        checks:
+          exitCode: 0
+          outputs:
+          - name: result_test2.sdf
             checks:
             - exists: true
