@@ -17,7 +17,8 @@ import rdkit_utils
 from Auto3D.auto3D import options, main
 from dm_job_utilities.dm_log import DmLog
 
-# logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger(__name__)
 
 SDF_SEP = '$$$$'
 CHUNK_SIZE = 4096
@@ -47,7 +48,7 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
     calc_prop_names = []
 
     ext = Path(input_filename).suffix
-
+    logger.warning('Output extension: %s', ext)
     count = 0
     while True:
         count += 1
@@ -60,6 +61,7 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
             # end of file
             break
 
+        logger.warning('mol: %s; smi: %s; mol_id: %s; props: %s', mol, smi, mol_id, props)
         DmLog.emit_event(f'Found structure: {mol_id}')
         if mol.GetNumAtoms() == 0:
             DmLog.emit_event(f'Zero-size structure removed: {mol_id}')
@@ -71,6 +73,8 @@ def process_input(input_filename, write_header, delimiter, read_header, id_colum
             output_filename,
             delimiter=delimiter,
         )
+
+        logger.warning('Writer: %s', writer)
 
         if write_header:
             headers = rdkit_utils.generate_header_values(extra_field_names, len(props), calc_prop_names)
@@ -277,7 +281,7 @@ if __name__ == "__main__":
         memory=args.memory,
         batchsize_atoms=args.batchsize_atoms,
     )
-
+    logger.warning('Opts: %s', opts)
     num_outputs = 0
 
     workdir, files = process_input(
