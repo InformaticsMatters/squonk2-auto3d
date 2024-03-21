@@ -137,7 +137,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pKaNorm",
         action="store_true",
-        default=True,
+        # default=False,
         help="When True, the ionization state of each tautomer will be assigned to a predominant state at ~7.4 (Only works when tauto_engine=’oechem’)",
     )
     parser.add_argument(
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mpi_np",
         type=int,
-        default=4,
+        default=3,
         help="Number of CPU cores for the isomer generation engine",
     )
     parser.add_argument(
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--memory",
         type=int,
-        default=None,
+        default=3,
         help="The RAM size assigned to Auto3D (unit GB)",
     )
     parser.add_argument(
