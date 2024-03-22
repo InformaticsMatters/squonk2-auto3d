@@ -1,5 +1,5 @@
 im-data-manager-job-utilities == 1.*
 torch==2.2.0
-AcAuto3D==1.0.0
+AcAuto3D==1.0.1
 rdkit==2023.9.4
 pandas==2.2.0
